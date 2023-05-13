@@ -2,8 +2,8 @@ package models
 
 import scala.xml.Node
 
-case class Security(var id: Long, var secid: String, var regnumber: String, var name: String,
-                    var emitentTitle: String)
+case class Security(id: Int, secid: String, regnumber: String, name: String,
+                    emitentTitle: String) extends Serializable
 
 object Security{
   def toXml(securityList: List[Security]): Node = {
@@ -35,7 +35,7 @@ object Security{
   }
 
   def parseXml(strXml: Node): Security = {
-    val id = (strXml \ "id").text.toLong
+    val id = (strXml \ "id").text.toInt
     val secid = (strXml \ "secid").text
     val regnumber = (strXml \ "regnumber").text
     val name = (strXml \ "name").text

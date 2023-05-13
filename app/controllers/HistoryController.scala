@@ -22,7 +22,7 @@ class HistoryController @Inject()(val controllerComponents: ControllerComponents
   }
 
   def getBySecid(secid: String): Action[AnyContent] = Action.async {
-    data.getHistoryBySecid(secid).map(result => if (result.nonEmpty) Ok(History.toXml(result.get)) else NotFound)
+    data.getHistoryBySecid(secid).map(result => if (result.nonEmpty) Ok(History.toXml(result)) else NotFound)
   }
 
   def updateBySecid(secid: String): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>

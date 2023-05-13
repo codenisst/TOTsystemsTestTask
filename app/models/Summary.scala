@@ -3,7 +3,7 @@ package models
 import scala.xml.Node
 
 case class Summary(var secid: String, var regnumber: String, var name: String, var emitentTitle: String,
-                   var tradedate: String, var numtrades: Int, var open: Option[Double], var close: Option[Double])
+                   var tradedate: String, var numtrades: Int, var open: Double, var close: Double)
 
 object Summary {
   def toXml(summaryList: List[Summary]): Node = {
@@ -15,8 +15,8 @@ object Summary {
         <emitent_title>{summary.emitentTitle}</emitent_title>
         <tradedate>{summary.tradedate}</tradedate>
         <numtrades>{summary.numtrades}</numtrades>
-        <open>{if (summary.open.nonEmpty) summary.open.get else ""}</open>
-        <close>{if (summary.close.nonEmpty) summary.close.get else ""}</close>
+        <open>{summary.open}</open>
+        <close>{summary.close}</close>
       </summary>
     }
     val xml = <summaries>

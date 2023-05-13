@@ -22,7 +22,7 @@ class SecurityController @Inject()(val controllerComponents: ControllerComponent
   }
 
   def getBySecid(secid: String): Action[AnyContent] = Action.async {
-    data.getSecurityBySecid(secid).map(result => if (result.nonEmpty) Ok(Security.toXml(result.get)) else NotFound)
+    data.getSecurityBySecid(secid).map(result => if (result.nonEmpty) Ok(Security.toXml(result)) else NotFound)
   }
 
   def updateBySecid(secid: String): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
