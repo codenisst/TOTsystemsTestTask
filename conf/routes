@@ -10,7 +10,7 @@
 #GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 GET           /import                   controllers.MainController.importInputData()
-GET           /summary                  controllers.MainController.getSummaryData()
+GET           /                         controllers.MainController.getSummaryData()
 
 GET           /history                  controllers.HistoryController.getAll()
 POST          /history/new              controllers.HistoryController.create()

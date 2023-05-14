@@ -7,14 +7,13 @@ import java.io.File
 import javax.inject._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.io.Source
 import scala.xml.XML
 
 @Singleton
 class DataService @Inject()(var daoHistory: DaoHistory,
                             var daoSecurity: DaoSecurity,
                             var daoSummary: DaoSummary) {
-
-  //TODO не забыть пофиксить парсинг некорректных xml, в которых неэкранированы спецсимволы
 
   def loadData(): Future[Boolean] = {
     loadSecuritiesWithFiles()
@@ -41,7 +40,9 @@ class DataService @Inject()(var daoHistory: DaoHistory,
   }
 
   def updateHistoryBySecid(secid: String, updHistoryFromBodyRequest: History): Future[Boolean] = {
-    if (!updHistoryFromBodyRequest.secid.equals(secid)) return Future{false}
+    if (!updHistoryFromBodyRequest.secid.equals(secid)) return Future {
+      false
+    }
     daoHistory.update(secid, updHistoryFromBodyRequest)
   }
 
@@ -74,10 +75,7 @@ class DataService @Inject()(var daoHistory: DaoHistory,
 
     if (files.nonEmpty) {
       files.foreach(file => {
-        val xml = XML.loadFile(file)
-        //        val source = Source.fromFile(file)
-        //        val xmlString = try source.mkString finally source.close()
-        //        val xml = XML.loadString(xmlString)
+        val xml = XML.loadString(fixXml(file))
 
         val newHistories: List[History] = (xml \\ "row")
           .filter(row => row.toString().contains("SECID"))
@@ -101,12 +99,8 @@ class DataService @Inject()(var daoHistory: DaoHistory,
 
     if (files.nonEmpty) {
       files.foreach(file => {
-        val xml = XML.loadFile(file)
-        //        val source = Source.fromFile(file)
-        //        var xmlString = (try source.mkString finally source.close())
-        //        xmlString = Utility.escape(xmlString)
-        //        println(xmlString)
-        //        val xml = XML.loadString(xmlString)
+
+        val xml = XML.loadString(fixXml(file))
 
         val newSecurity: List[Security] = (xml \\ "row")
           .map(row =>
@@ -122,5 +116,16 @@ class DataService @Inject()(var daoHistory: DaoHistory,
         daoSecurity.saveAll(newSecurity)
       })
     }
+  }
+
+  private def fixXml(xmlFile: File): String = {
+    val source = Source.fromFile(xmlFile)
+    var xmlString = try source.mkString finally source.close()
+    val values = xmlString.split("^<\\w+|(\\s\\w+=\")|([\"]\\s[A-z\\d]+?=\")|\"/>|\">")
+    values.foreach(s => {
+      if (s.contains("\"")) xmlString = xmlString.replaceAll(s, s.replaceAll("\"", "&quot;"))
+      if (s.contains("&")) xmlString = xmlString.replaceAll(s, s.replaceAll("&", "&amp;"))
+    })
+    xmlString
   }
 }
