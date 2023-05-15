@@ -4,8 +4,8 @@ import dao.repositories.{HistoryRepo, SecurityRepo}
 import org.sqlite.SQLiteConfig.Pragma
 import org.sqlite.{SQLiteConfig, SQLiteException}
 import slick.dbio.{DBIOAction, Effect, NoStream}
-import slick.lifted.TableQuery
 import slick.jdbc.SQLiteProfile.api._
+import slick.lifted.TableQuery
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

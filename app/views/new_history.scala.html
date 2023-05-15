@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+    <head>
+        <title>Создать новую историю</title>
+    </head>
+    <body>
+        <h1>Создать новую историю</h1>
+        <form action="/history/new" method="post" enctype="application/x-www-form-urlencoded">
+            <label for="secid">Secid:</label>
+            <input type="text" id="secid" name="secid">
+            <br>
+            <label for="tradedate">Tradedate:</label>
+            <input type="text" id="tradedate" name="tradedate">
+            <br>
+            <label for="numtrades">Numtrades:</label>
+            <input type="text" id="numtrades" name="numtrades">
+            <br>
+            <label for="open">Open:</label>
+            <input type="text" id="open" name="open">
+            <br>
+            <label for="close">Close:</label>
+            <input type="text" id="close" name="close">
+            <br>
+            <br>
+            <input type="submit" value="Создать">
+        </form>
+        <br>
+        <a href="/">Главная</a>
+    </body>
+</html>

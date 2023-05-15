@@ -10,8 +10,5 @@ trait CrudOperations {
 
   def getBySecid(secid: String): Action[AnyContent]
 
-  def updateBySecid(secid: String): Action[AnyContent]
-
-  def deleteBySecid(secid: String): Action[AnyContent]
-
+  def updateOrDeleteBySecid(secid: String): Action[AnyContent]
 }

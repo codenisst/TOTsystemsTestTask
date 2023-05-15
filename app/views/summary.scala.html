@@ -1,0 +1,35 @@
+@(list: List[(String, List[Any])])
+
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+    <head>
+        <title>Сводка</title>
+    </head>
+    <body>
+        <h1>Сводка</h1>
+
+        @for(model <- list.head._2) {
+            <li>
+                @model.toString
+                @if(list.head._1 == "history") {
+                    <a href="/history/@(model.asInstanceOf[History].secid)">Информация</a>
+                }
+                @if(list.head._1 == "security") {
+                    <a href="/security/@(model.asInstanceOf[Security].secid)">Информация</a>
+                }
+            </li>
+        }
+            <br>
+        @if(list.head._1 == ("history")) {
+            <a href="/history/new">Создать новую историю</a>
+            <br>
+        }
+        @if(list.head._1 == "security") {
+            <a href="/security/new">Создать новую бумагу</a>
+            <br>
+        }
+        <a href="/">Главная</a>
+        <br>
+    </body>
+</html>

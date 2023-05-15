@@ -1,0 +1,68 @@
+@(model: Any)
+
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+    <head>
+        <title>Информация</title>
+    </head>
+    <body>
+        <h1>Информация</h1>
+
+        @if(model.getClass.getSimpleName == "History") {
+            Secid - @(model.asInstanceOf[History].secid) <br>
+            Tradedate - @(model.asInstanceOf[History].tradedate) <br>
+            Numtrade - @(model.asInstanceOf[History].numtrades) <br>
+            Open - @(model.asInstanceOf[History].open) <br>
+            Close - @(model.asInstanceOf[History].close) <br>
+            <br>
+            <form action="/history/@(model.asInstanceOf[History].secid)" method="post" enctype="application/x-www-form-urlencoded">
+                <label for="secid">Secid:</label>
+                <input type="text" id="secid" name="secid"><br>
+                <label for="tradedate">Tradedate:</label>
+                <input type="text" id="tradedate" name="tradedate"><br>
+                <label for="numtrades">Numtrades:</label>
+                <input type="text" id="numtrades" name="numtrades"><br>
+                <label for="open">Open:</label>
+                <input type="text" id="open" name="open"><br>
+                <label for="close">Close:</label>
+                <input type="text" id="close" name="close"><br><br>
+                <input type="hidden" name="_method" value="POST">
+                <input type="submit" value="Обновить">
+            </form>
+            <form method="POST" action="/history/@(model.asInstanceOf[History].secid)">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit">Удалить</button>
+            </form>
+        }
+        @if(model.getClass.getSimpleName == "Security") {
+            ID - @(model.asInstanceOf[Security].id) <br>
+            Secid - @(model.asInstanceOf[Security].secid) <br>
+            Regnumber - @(model.asInstanceOf[Security].regnumber) <br>
+            Name - @(model.asInstanceOf[Security].name) <br>
+            EmitentTitle - @(model.asInstanceOf[Security].emitentTitle) <br>
+            <br>
+            <form action="/security/@(model.asInstanceOf[Security].secid)" method="post" enctype="application/x-www-form-urlencoded">
+                <label for="id">ID:</label>
+                <input type="text" id="id" name="id"><br>
+                <label for="secid">Secid:</label>
+                <input type="text" id="secid" name="secid"><br>
+                <label for="regnumber">Regnumber:</label>
+                <input type="text" id="regnumber" name="regnumber"><br>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name"><br>
+                <label for="emitentTitle">Emitent title:</label>
+                <input type="text" id="emitentTitle" name="emitentTitle"><br><br>
+                <input type="hidden" name="_method" value="POST">
+                <input type="submit" value="Обновить">
+            </form>
+            <form method="POST" action="/security/@(model.asInstanceOf[Security].secid)">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit">Удалить</button>
+            </form>
+        }
+        <br>
+        <a href="/">Главная</a>
+        <br>
+    </body>
+</html>

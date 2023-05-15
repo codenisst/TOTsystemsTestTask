@@ -5,16 +5,17 @@ import slick.jdbc.SQLiteProfile.api._
 
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 @Singleton
 class DaoSecurity extends Dao {
 
-  def saveAll(listSecurities: List[Security]): Unit = {
+  def saveAll(listSecurities: List[Security]): Future[Boolean] = {
     val existingSec = Await.result(connection.run(securityTable.map(_.secid).result).map(_.toList), Duration.Inf)
     val validData = listSecurities.filter(d => !existingSec.contains(d.secid))
-    connection.run(securityTable ++= validData)
+    Future.successful {connection.run(securityTable ++= validData).map(result => result.nonEmpty)
+    }.value.get.get
   }
 
   def save(security: Security): Future[Boolean] = {

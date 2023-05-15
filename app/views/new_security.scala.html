@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+    <head>
+        <title>Создать новую бумагу</title>
+    </head>
+    <body>
+        <h1>Создать новую бумагу</h1>
+        <form action="/security/new" method="post" enctype="application/x-www-form-urlencoded">
+            <label for="id">ID:</label>
+            <input type="text" id="id" name="id">
+            <br>
+            <label for="secid">Secid:</label>
+            <input type="text" id="secid" name="secid">
+            <br>
+            <label for="regnumber">Regnumber:</label>
+            <input type="text" id="regnumber" name="regnumber">
+            <br>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name">
+            <br>
+            <label for="emitentTitle">Emitent title:</label>
+            <input type="text" id="emitentTitle" name="emitentTitle">
+            <br>
+            <br>
+            <input type="submit" value="Создать">
+        </form>
+        <br>
+        <a href="/">Главная</a>
+    </body>
+</html>

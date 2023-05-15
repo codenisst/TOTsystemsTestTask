@@ -14,9 +14,7 @@ class DaoHistory extends Dao {
   def saveAll(listHistories: List[History]): Unit = {
     val existingSec = Await.result(connection.run(securityTable.map(_.secid).result).map(_.toList), Duration.Inf)
     val existingHis = Await.result(connection.run(historyTable.map(_.secid).result).map(_.toList), Duration.Inf)
-    println(existingSec)
     val validData = listHistories.filter(d => existingSec.contains(d.secid) && !existingHis.contains(d.secid))
-    println(validData)
     connection.run(historyTable ++= validData)
   }
 

@@ -3,23 +3,26 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
-# An example controller showing a sample home page
-#GET     /                           controllers.HomeController.index()
+GET         /                       controllers.MainController.getSummaryData()
+GET         /import                 controllers.MainController.getImportPage()
++nocsrf
+POST        /import-his             controllers.MainController.importHisWithFile()
++nocsrf
+POST        /import-sec             controllers.MainController.importSecWithFile()
+GET         /import-af              controllers.MainController.importFromAttachedFiles()
 
-# Map static resources from the /public folder to the /assets URL path
-#GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET         /history                controllers.HistoryController.getAll()
+GET         /history/new            controllers.HistoryController.getCreatePage()
++nocsrf
+POST        /history/new            controllers.HistoryController.create()
+GET         /history/:secid         controllers.HistoryController.getBySecid(secid: String)
++nocsrf
+POST        /history/:secid         controllers.HistoryController.updateOrDeleteBySecid(secid: String)
 
-GET           /import                   controllers.MainController.importInputData()
-GET           /                         controllers.MainController.getSummaryData()
-
-GET           /history                  controllers.HistoryController.getAll()
-POST          /history/new              controllers.HistoryController.create()
-GET           /history/:secid           controllers.HistoryController.getBySecid(secid: String)
-POST          /history/:secid           controllers.HistoryController.updateBySecid(secid: String)
-DELETE        /history/:secid           controllers.HistoryController.deleteBySecid(secid: String)
-
-GET           /securities               controllers.SecurityController.getAll()
-POST          /securities/new           controllers.SecurityController.create()
-GET           /securities/:secid        controllers.SecurityController.getBySecid(secid: String)
-POST          /securities/:secid        controllers.SecurityController.updateBySecid(secid: String)
-DELETE        /securities/:secid        controllers.SecurityController.deleteBySecid(secid: String)
+GET         /security               controllers.SecurityController.getAll()
+GET         /security/new           controllers.SecurityController.getCreatePage()
++nocsrf
+POST        /security/new           controllers.SecurityController.create()
+GET         /security/:secid        controllers.SecurityController.getBySecid(secid: String)
++nocsrf
+POST        /security/:secid        controllers.SecurityController.updateOrDeleteBySecid(secid: String)

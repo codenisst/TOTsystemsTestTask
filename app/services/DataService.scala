@@ -8,12 +8,14 @@ import javax.inject._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.io.Source
+import scala.util.Success
 import scala.xml.XML
 
 @Singleton
 class DataService @Inject()(var daoHistory: DaoHistory,
                             var daoSecurity: DaoSecurity,
-                            var daoSummary: DaoSummary) {
+                            var daoSummary: DaoSummary,
+                            var httpDispatcher: HttpDispatcher) {
 
   def loadData(): Future[Boolean] = {
     loadSecuritiesWithFiles()
@@ -70,6 +72,14 @@ class DataService @Inject()(var daoHistory: DaoHistory,
     daoSecurity.delete(secid)
   }
 
+  def loadSecWithInputFile(file: File): Unit = {
+    writeSec(file)
+  }
+
+  def loadHisWithInputFile(file: File): Unit = {
+    writeHis(file)
+  }
+
   private def loadHistoriesWithFiles(): Unit = {
     val files = new File("public/inputData/histories").listFiles.filter(_.getName.endsWith(".xml")).toSeq
 
@@ -80,13 +90,7 @@ class DataService @Inject()(var daoHistory: DaoHistory,
         val newHistories: List[History] = (xml \\ "row")
           .filter(row => row.toString().contains("SECID"))
           .map { row =>
-            History(
-              secid = (row \ "@SECID").text,
-              tradedate = (row \ "@TRADEDATE").text,
-              numtrades = (row \ "@NUMTRADES").text.toInt,
-              open = if ((row \ "@OPEN").text.nonEmpty) (row \ "@OPEN").text.toDouble else 0.0,
-              close = if ((row \ "@CLOSE").text.nonEmpty) (row \ "@CLOSE").text.toDouble else 0.0
-            )
+            History.parseFromXmlFile(row)
           }.toList
 
         daoHistory.saveAll(newHistories)
@@ -99,33 +103,71 @@ class DataService @Inject()(var daoHistory: DaoHistory,
 
     if (files.nonEmpty) {
       files.foreach(file => {
-
-        val xml = XML.loadString(fixXml(file))
-
-        val newSecurity: List[Security] = (xml \\ "row")
-          .map(row =>
-            Security(
-              id = (row \ "@id").text.toInt,
-              secid = (row \ "@secid").text,
-              regnumber = (row \ "@regnumber").text,
-              name = (row \ "@name").text,
-              emitentTitle = (row \ "@emitent_title").text
-            )
-          ).toList
-
-        daoSecurity.saveAll(newSecurity)
+        writeSec(file)
       })
     }
   }
 
   private def fixXml(xmlFile: File): String = {
     val source = Source.fromFile(xmlFile)
-    var xmlString = try source.mkString finally source.close()
-    val values = xmlString.split("^<\\w+|(\\s\\w+=\")|([\"]\\s[A-z\\d]+?=\")|\"/>|\">")
+    fixXmlString(try source.mkString finally source.close())
+  }
+
+  private def fixXmlString(xmlStringInput: String): String = {
+    var xmlString = xmlStringInput
+    val values = xmlString.split("^<\\w+|(\\s\\w+=\")|([\"]\\s[A-z\\d]+?=\")|\"\\s/>|\"/>|\">")
     values.foreach(s => {
       if (s.contains("\"")) xmlString = xmlString.replaceAll(s, s.replaceAll("\"", "&quot;"))
-      if (s.contains("&")) xmlString = xmlString.replaceAll(s, s.replaceAll("&", "&amp;"))
+      if (!s.contains("&amp;") && s.contains("&")) xmlString = xmlString.replaceAll(s, s.replaceAll("&", "&amp;"))
     })
     xmlString
+  }
+
+  private def writeSec(file: File): Unit = {
+    val xml = XML.loadString(fixXml(file))
+
+    val newSecurity: List[Security] = (xml \\ "row")
+      .map(row =>
+        Security.parseFromXmlFile(row)
+      ).toList
+
+    daoSecurity.saveAll(newSecurity)
+  }
+
+  private def writeHis(file: File): Unit = {
+    val xml = XML.loadString(fixXml(file))
+
+    val newHistory: List[History] = (xml \\ "row")
+      .map(row =>
+        History.parseFromXmlFile(row)
+      ).toList
+
+    var responsesSec = List[String]()
+
+    val request = newHistory.map(history =>
+      Future {
+        httpDispatcher.sendRequest(history.secid)
+      }.map(result => responsesSec = result :: responsesSec)
+    )
+
+    val futureResult = Future.sequence(request)
+
+    futureResult.onComplete {
+      case Success(results) =>
+        var newSec = List[Security]()
+        responsesSec.foreach(response => {
+          val xml = XML.loadString(fixXmlString(response))
+
+          val newSecurities: List[Security] = (xml \\ "row")
+            .filter(row => row.toString().contains("secid"))
+            .map { row =>
+              Security.parseFromXmlFile(row)
+            }.toList.filter(sec => newHistory.exists(his => sec.secid == his.secid))
+
+          newSecurities.foreach(nSec => if (!newSec.contains(nSec)) newSec = nSec :: newSec)
+        })
+        daoSecurity.saveAll(newSec).map(f => daoHistory.saveAll(newHistory))
+      case _ => println("An error occurred")
+    }
   }
 }

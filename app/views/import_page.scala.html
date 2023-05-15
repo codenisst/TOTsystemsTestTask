@@ -1,0 +1,37 @@
+@(typeImport: String)
+
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+    <head>
+        <title>Импорт</title>
+    </head>
+    <body>
+        @typeImport match {
+            case "sec" => {
+                <h1>Импорт информации о ценных бумагах</h1>
+                <br>
+                <form action="/import-sec" method="post" enctype="multipart/form-data">
+                    <label for="file1">Выберите файл с информацией о ценных бумагах</label>
+                    <input type="file" id="sec" name="history">
+                    <br>
+                    <button type="submit">Отправить</button>
+                </form>
+            }
+            case "his" => {
+                <h1>Импорт истории торговли ценными бумагами</h1>
+                <br>
+                <form action="/import-his" method="post" enctype="multipart/form-data">
+                    <label for="file1">Выберите файл с историей торговли</label>
+                    <input type="file" id="his" name="history">
+                    <br>
+                    <button type="submit">Отправить</button>
+                </form>
+            }
+        }
+
+    <br>
+    <a href="/">Главная</a>
+    <br>
+    </body>
+</html>
